@@ -8,17 +8,17 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// ✅ MongoDB Connection (Replace with your actual MongoDB URI)
-const mongoURI = 'mongodb+srv://kumarpatelrakesh222:5rqdGjk2vBtKdVob@uploads.tc9np.mongodb.net/echosealDB?retryWrites=true&w=majority&appName=uploads';
+// ✅ MongoDB Connection
+const mongoURI = 'mongodb+srv://kumarpatelrakesh222:5rqdGjk2vBtKdVob@uploads.tc9np.mongodb.net/test?retryWrites=true&w=majority&appName=uploads';
 
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => console.log('✅ Connected to MongoDB'))
+  .then(() => console.log('✅ Connected to MongoDB (test.files)'))
   .catch(err => console.error('❌ Could not connect to MongoDB', err));
 
-// ✅ File Schema
+// ✅ File Schema for test.files
 const fileSchema = new mongoose.Schema({
   filename: String,
   data: Buffer,
@@ -26,34 +26,25 @@ const fileSchema = new mongoose.Schema({
   uploadDate: { type: Date, default: Date.now }
 });
 
-const File = mongoose.model('File', fileSchema);
+const File = mongoose.model('File', fileSchema, 'files'); // "files" from "test.files"
 
-// ✅ Fetch All Files (same as before)
+// ✅ Fetch All Files from test.files
 app.get('/uploads', async (req, res) => {
   try {
     const files = await File.find().sort({ uploadDate: -1 });
-    res.json(files.map(file => ({
-      id: file._id,
-      filename: file.filename,
-      uploadDate: file.uploadDate,
-    })));
-  } catch (error) {
-    console.error('Error fetching files:', error);
-    res.status(500).json({ error: 'Failed to fetch files.' });
-  }
-});
 
-// ✅ Fetch and display MongoDB data on the root route:
-app.get('/', async (req, res) => {
-  try {
-    const files = await File.find().sort({ uploadDate: -1 }); // Get all files
+    console.log("✅ Fetched Files:", files);
+
     res.json(files.map(file => ({
       id: file._id,
       filename: file.filename,
+      contentType: file.contentType,
       uploadDate: file.uploadDate,
+      data: file.data.toString('base64') // Binary to Base64
     })));
+
   } catch (error) {
-    console.error('Error fetching files:', error);
+    console.error('❌ Error fetching files:', error);
     res.status(500).json({ error: 'Failed to fetch files.' });
   }
 });
