@@ -8,7 +8,7 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// ✅ MongoDB Connection
+// ✅ MongoDB Connection (Replace with your actual MongoDB URI)
 const mongoURI = 'mongodb+srv://kumarpatelrakesh222:5rqdGjk2vBtKdVob@uploads.tc9np.mongodb.net/echosealDB?retryWrites=true&w=majority&appName=uploads';
 
 mongoose.connect(mongoURI, {
@@ -41,6 +41,11 @@ app.get('/uploads', async (req, res) => {
     console.error('Error fetching files:', error);
     res.status(500).json({ error: 'Failed to fetch files.' });
   }
+});
+
+// ✅ Add the root route here:
+app.get('/', (req, res) => {
+  res.send('Welcome to the EchoSeal Uploads API!'); // Or send a JSON response, etc.
 });
 
 // ✅ Start Server
