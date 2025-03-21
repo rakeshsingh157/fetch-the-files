@@ -28,7 +28,7 @@ const fileSchema = new mongoose.Schema({
 
 const File = mongoose.model('File', fileSchema);
 
-// ✅ Fetch All Files
+// ✅ Fetch All Files (same as before)
 app.get('/uploads', async (req, res) => {
   try {
     const files = await File.find().sort({ uploadDate: -1 });
@@ -43,9 +43,19 @@ app.get('/uploads', async (req, res) => {
   }
 });
 
-// ✅ Add the root route here:
-app.get('/', (req, res) => {
-  res.send('Welcome to the EchoSeal Uploads API!'); // Or send a JSON response, etc.
+// ✅ Fetch and display MongoDB data on the root route:
+app.get('/', async (req, res) => {
+  try {
+    const files = await File.find().sort({ uploadDate: -1 }); // Get all files
+    res.json(files.map(file => ({
+      id: file._id,
+      filename: file.filename,
+      uploadDate: file.uploadDate,
+    })));
+  } catch (error) {
+    console.error('Error fetching files:', error);
+    res.status(500).json({ error: 'Failed to fetch files.' });
+  }
 });
 
 // ✅ Start Server
