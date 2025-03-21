@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
-const port = 3001;
+const port = 3001; // Or 3000, as you mentioned
 
 app.use(cors());
 app.use(express.json());
@@ -23,7 +23,7 @@ const fileSchema = new mongoose.Schema({
   filename: String,
   data: Buffer,
   contentType: String,
-  uploadDate: { type: Date, default: Date.now }
+  uploadDate: { type: Date, default: Date.now },
 });
 
 const File = mongoose.model('File', fileSchema, 'files'); // "files" from "test.files"
@@ -33,20 +33,26 @@ app.get('/uploads', async (req, res) => {
   try {
     const files = await File.find().sort({ uploadDate: -1 });
 
-    console.log("✅ Fetched Files:", files);
+    console.log('✅ Fetched Files:', files);
 
-    res.json(files.map(file => ({
-      id: file._id,
-      filename: file.filename,
-      contentType: file.contentType,
-      uploadDate: file.uploadDate,
-      data: file.data.toString('base64') // Binary to Base64
-    })));
-
+    res.json(
+      files.map((file) => ({
+        id: file._id,
+        filename: file.filename,
+        contentType: file.contentType,
+        uploadDate: file.uploadDate,
+        data: file.data.buffer.toString('base64'), // Correctly convert Binary to Base64
+      }))
+    );
   } catch (error) {
     console.error('❌ Error fetching files:', error);
     res.status(500).json({ error: 'Failed to fetch files.' });
   }
+});
+
+// ✅ Root Route (Add this!)
+app.get('/', (req, res) => {
+  res.send('Welcome to your API!'); // Or send a JSON response, etc.
 });
 
 // ✅ Start Server
